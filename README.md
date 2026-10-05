@@ -1,39 +1,24 @@
-# FDA Food Insights – Unsupervised Clustering & Topic Modelling
+# FDA Adverse Event Reports: Clustering & Topic Modeling
 
-## Overview
-This project applies unsupervised machine learning techniques to explore patterns in FDA food event data. Through dimensionality reduction (Truncated SVD, UMAP), K‑means clustering, and non‑negative matrix factorisation (NMF) topic modelling, it uncovers relationships and themes within unstructured text reports.
+Unsupervised analysis of about 120K FDA CAERS adverse event reports (foods, supplements, cosmetics) to group reports by reaction and outcome and surface which event types are most severe and slowest to reach the regulator.
+
+**Stack:** Python, scikit-learn (TF-IDF, TruncatedSVD, K-Means, NMF), UMAP, Plotly  
+**Context:** Team 11 project, Unsupervised Machine Learning, BU Questrom. Developers: Aaryan Bammi, Pratik Mahajan, Raskirt Singh Bhatia, Saketh Bolina.
 
 ## Data
-The FDA Food Event dataset contains reports of adverse food events with textual descriptions, dates and categorical attributes. The full dataset is large (> 8 MB); only sample code is provided here. You may obtain the dataset from the FDA open data portal.
+[FDA CAERS food, supplement and cosmetic adverse event reports](https://open.fda.gov/data/caers/): 120,329 reports with reactions, outcomes, product, industry and consumer age. Cosmetics and vitamins/supplements make up most of the volume. The CSV is not included.
 
-## Methodology
-1. **Data cleaning:** Remove duplicates, filter for relevant report types and extract text fields.
-2. **Vectorisation:** Convert cleaned text into TF–IDF features and apply Truncated SVD or UMAP for dimensionality reduction.
-3. **Clustering:** Perform K‑means clustering on the reduced embeddings to group similar reports.
-4. **Topic modelling:** Use NMF on the TF–IDF matrix to extract coherent topics and top terms for each cluster.
-5. **Visualisation:** Plot 2D embeddings coloured by cluster and display bar charts of top words per topic.
+## Approach
+- Cleaned the data and standardised consumer age across mixed units (days, weeks, months, years, decades)
+- Cleaned the free-text `reactions` and `outcomes` fields and built TF-IDF features, plus frequency-encoded brand and one-hot categorical features (182 features)
+- Reduced to 50 dimensions with TruncatedSVD (UMAP for 2D views) and clustered with K-Means; picked k = 3 from elbow and silhouette scores
+- Fitted a 10-topic NMF model and labelled each topic, then profiled topics by consumer age and days to report
 
-## Key Insights
-- Distinct clusters correspond to contamination types (e.g., allergen, pathogen, foreign material).
-- Topics reveal patterns such as product categories (nuts, dairy), hazard types and common symptoms.
-- Dimensionality reduction improves interpretability and visualisation of text‑based clusters.
+## Key findings
+- Ten readable topics emerged, such as skin and allergic reactions, abdominal and gastro issues, ER visits, hospitalisation, and cancer
+- Cancer-related and fatal-outcome reports take far longer to reach the FDA (around 3,200 to 3,400 days on average) than ER-visit or gastro reports (around 90 to 110 days), which points to long-latency harms going unreported for years
+- Fatal-outcome reports involve the oldest consumers on average (about 61 years)
 
-## Usage
-1. Install dependencies:
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. Launch the notebook:
-
-   ```bash
-   jupyter notebook fda_foodinsights_clustering_topic_modeling.ipynb
-   ```
-
-3. Provide a CSV file of FDA food event reports (with a “description” column) and follow the notebook instructions to reproduce the analysis.
-
-## Next Steps
-- Experiment with other clustering algorithms (DBSCAN, hierarchical clustering).
-- Use LDA or BERTopic for alternative topic modelling approaches.
-- Integrate the findings into a dashboard for regulators and food producers.
+## Repo contents
+- `Consolidated_Code.ipynb`: full analysis
+- `requirements.txt`
